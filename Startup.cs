@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Blazor.CustomAuth.Data;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Blazor.CustomAuth
 {
@@ -29,6 +30,7 @@ namespace Blazor.CustomAuth
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<AuthenticationStateProvider, AuthProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

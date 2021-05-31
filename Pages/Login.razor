@@ -1,0 +1,41 @@
+@page "/Login"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage SessionStorage
+@using Data
+@attribute [AllowAnonymous]
+
+<button class="btn btn-lg btn-primary" @onclick="DoLogin">Make fake login</button>
+<button class="btn btn-lg btn-primary" @onclick="DoLogout">Make fake logout</button>
+
+@if (userSession != null)
+{
+    <div>Logged in as @userSession.Username </div>
+}
+
+@code{
+    private User userSession = new User();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var result = await SessionStorage.GetAsync<User>("authKey");
+        if (result.Success)
+        {
+            userSession.Username = result.Value.Username;
+            StateHasChanged();
+        }
+    }
+
+    private void DoLogin()
+    {
+        userSession.Username = "Admin";
+        SessionStorage.SetAsync("authKey", userSession);
+
+    }
+    private void DoLogout()
+    {
+        SessionStorage.DeleteAsync("authKey");
+        userSession.Username = null;
+        StateHasChanged();
+
+    }
+}

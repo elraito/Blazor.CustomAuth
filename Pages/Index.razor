@@ -1,7 +1,41 @@
 @page "/"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage SessionStorage
+@inject NavigationManager NavigationManager
+@using Data
+@attribute [AllowAnonymous]
 
-<h1>Hello, world!</h1>
+<button class="btn btn-lg btn-primary" @onclick="DoLogin">Make fake login</button>
+<button class="btn btn-lg btn-primary" @onclick="DoLogout">Make fake logout</button>
 
-Welcome to your new app.
+@if (userSession != null)
+{
+    <div>Logged in as @userSession.Username </div>
+}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code{
+    private User userSession = new User();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var result = await SessionStorage.GetAsync<User>("authKey");
+        if (result.Success)
+        {
+            userSession.Username = result.Value.Username;
+            StateHasChanged();
+        }
+    }
+
+    private void DoLogin()
+    {
+        userSession.Username = "Admin";
+        SessionStorage.SetAsync("authKey", userSession);
+        NavigationManager.NavigateTo("/", true);
+    }
+    private void DoLogout()
+    {
+        SessionStorage.DeleteAsync("authKey");
+        userSession.Username = null;
+        NavigationManager.NavigateTo("/", true);
+    }
+}
